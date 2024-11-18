@@ -10,7 +10,7 @@ class TaskController extends Controller
     public function index()
     {
         $tasks = Task::all();
-        return view('tasks.index');
+        return view('tasks.index', compact('tasks'));
     }
 
     public function create()
@@ -33,19 +33,34 @@ class TaskController extends Controller
 
     public function show(Task $task)
     {
-        //
+        return view('tasks.show', compact('task'));
     }
 
 
     public function edit(Task $task)
     {
-        return view('tasks.edit', compact('tasks'));
+        return view('tasks.edit', compact('task'));
     }
 
 
     public function update(Request $request, Task $task)
     {
-        $validated = $request->validate([]);
+
+        $validated = $request->validate([
+            'title' => 'required', 
+            'description' => 'required',   
+            'due_date' => 'required|date',        
+            'priority' => 'required|in:High,Medium,Low', 
+        ]);
+        
+        $task->update([
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'due_date' => $validated['due_date'],
+            'priority' => $validated['priority'],
+        ]);
+
+        return redirect()->route('tasks.index')->with('success', 'Product updated successfully.');
     }
 
 
